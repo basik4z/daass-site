@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ДААСС — Экспорт чата</title>
+    <title>ДААСС</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -71,11 +72,11 @@
         .btn-success {
             background: linear-gradient(135deg, #34d399, #10b981);
         }
-        .btn-danger {
-            background: linear-gradient(135deg, #f87171, #ef4444);
-        }
         .btn-secondary {
             background: rgba(255, 255, 255, 0.05);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #f87171, #ef4444);
         }
         .status-badge {
             display: inline-block;
@@ -156,12 +157,12 @@
         <!-- Шаг 2: Ожидание контакта -->
         <div class="card hidden" id="stepWaiting">
             <h3>⏳ Ожидание контакта</h3>
-            <p>Нажми на кнопку «Отправить контакт» в Telegram, выбери человека и отправь.</p>
+            <p>Выбери контакт в открывшемся окне Telegram</p>
             <div class="loader"></div>
             <button class="btn btn-secondary" id="cancelBtn">❌ Отменить</button>
         </div>
 
-        <!-- Шаг 3: Контакт получен, экспорт -->
+        <!-- Шаг 3: Контакт получен -->
         <div class="card hidden" id="stepExport">
             <h3>📤 Экспорт</h3>
             <div class="contact-sent" id="contactInfo">✅ Контакт получен</div>
@@ -178,23 +179,20 @@
         tg.expand();
         tg.ready();
 
-        // Шаги
+        // Элементы
         const stepMain = document.getElementById('stepMain');
         const stepWaiting = document.getElementById('stepWaiting');
         const stepExport = document.getElementById('stepExport');
-
-        // Кнопки
         const sendContactBtn = document.getElementById('sendContactBtn');
         const cancelBtn = document.getElementById('cancelBtn');
         const exportBtn = document.getElementById('exportBtn');
-
-        // Статусы
         const contactInfo = document.getElementById('contactInfo');
         const exportStatus = document.getElementById('exportStatus');
         const exportLoader = document.getElementById('exportLoader');
 
-        // Отправить контакт через WebApp
+        // Кнопка "Отправить контакт" — открывает окно выбора контакта
         sendContactBtn.addEventListener('click', () => {
+            // Запрашиваем контакт через WebApp
             tg.sendData(JSON.stringify({ action: 'request_contact' }));
             stepMain.classList.add('hidden');
             stepWaiting.classList.remove('hidden');
@@ -213,37 +211,18 @@
             tg.sendData(JSON.stringify({ action: 'export_chat' }));
         });
 
-        // Слушаем сообщения от бота через WebApp
-        tg.onEvent('mainButtonClicked', (data) => {
-            // Обработка данных
-        });
+        // Функция для обработки контакта
+        function handleContact(contact) {
+            stepWaiting.classList.add('hidden');
+            stepExport.classList.remove('hidden');
+            contactInfo.textContent = `✅ Контакт: ${contact.first_name} ${contact.last_name || ''}`;
+            exportStatus.textContent = 'Готов к экспорту. Нажми кнопку ниже.';
+            exportLoader.style.display = 'none';
+        }
 
-        // Обработка входящих данных от бота
-        window.addEventListener('message', (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                if (data.type === 'contact_received') {
-                    stepWaiting.classList.add('hidden');
-                    stepExport.classList.remove('hidden');
-                    contactInfo.textContent = `✅ Контакт: ${data.name}`;
-                    exportStatus.textContent = 'Готов к экспорту. Нажми кнопку ниже.';
-                }
-                if (data.type === 'export_done') {
-                    exportStatus.textContent = `✅ Экспорт завершён! Файл отправлен.`;
-                    exportLoader.style.display = 'none';
-                    setTimeout(() => tg.close(), 2000);
-                }
-                if (data.type === 'export_error') {
-                    exportStatus.textContent = `❌ Ошибка: ${data.message}`;
-                    exportLoader.style.display = 'none';
-                }
-            } catch (e) {
-                // ignore
-            }
-        });
-
-        // Если бот присылает контакт через WebApp
+        // Слушаем события от Telegram WebApp
         tg.onEvent('contact', (contact) => {
+            // Отправляем контакт боту
             tg.sendData(JSON.stringify({
                 action: 'contact_sent',
                 contact: {
@@ -253,7 +232,32 @@
                     phone_number: contact.phone_number
                 }
             }));
+            handleContact(contact);
         });
+
+        // Обработка сообщений от бота (через WebApp)
+        window.addEventListener('message', (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.type === 'export_done') {
+                    exportStatus.textContent = `✅ Экспорт завершён! Файл отправлен.`;
+                    exportLoader.style.display = 'none';
+                    setTimeout(() => tg.close(), 2000);
+                }
+                if (data.type === 'export_error') {
+                    exportStatus.textContent = `❌ Ошибка: ${data.message}`;
+                    exportLoader.style.display = 'none';
+                }
+                if (data.type === 'contact_received') {
+                    handleContact(data.contact);
+                }
+            } catch (e) {
+                // ignore
+            }
+        });
+
+        // Если бот отправил контакт через WebApp
+        tg.ready();
     </script>
 </body>
 </html>
