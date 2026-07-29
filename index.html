@@ -2,30 +2,258 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ДААСС</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ДААСС — Экспорт чата</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0a0a0f;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 420px;
+            width: 100%;
+        }
+        .logo {
+            font-size: 36px;
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(135deg, #6ee7ff, #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 24px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 0.5px solid rgba(255, 255, 255, 0.06);
+        }
+        .card h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #6ee7ff;
+        }
+        .card p {
+            font-size: 14px;
+            color: #8e9aaf;
+            margin-bottom: 12px;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #6ee7ff, #a855f7);
+            border: none;
+            border-radius: 40px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+        .btn:active {
+            transform: scale(0.97);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #34d399, #10b981);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        .status-ok {
+            background: rgba(52, 211, 153, 0.15);
+            color: #34d399;
+        }
+        .status-wait {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
+        }
+        .hidden {
+            display: none;
+        }
+        .footer {
+            text-align: center;
+            font-size: 11px;
+            color: #3a4050;
+            margin-top: 20px;
+        }
+        .warning-box {
+            background: rgba(251, 191, 36, 0.08);
+            border-left: 3px solid #fbbf24;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #fbbf24;
+        }
+        .contact-sent {
+            background: rgba(52, 211, 153, 0.08);
+            border-left: 3px solid #34d399;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #34d399;
+        }
+        .loader {
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            border-top: 2px solid #a855f7;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 0.8s linear infinite;
+            margin: 16px auto;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="app">
-        <div class="header">
-            <h1>ДААСС</h1>
-            <p>Твой помощник в Telegram</p>
+    <div class="container">
+
+        <div class="logo">ДААСС</div>
+
+        <!-- Шаг 1: Главная -->
+        <div class="card" id="stepMain">
+            <h3>📦 Экспорт чата</h3>
+            <p>Отправь контакт человека, с которым хочешь экспортировать переписку.</p>
+            <div class="warning-box">
+                ⚠️ Контакт будет удалён после экспорта
+            </div>
+            <button class="btn btn-success" id="sendContactBtn">📇 Отправить контакт</button>
         </div>
-        <div class="stats">
-            <div class="stat"><span>📦</span> <span id="msgCount">0</span></div>
-            <div class="stat"><span>❌</span> <span id="delCount">0</span></div>
-            <div class="stat"><span>✏️</span> <span id="editCount">0</span></div>
+
+        <!-- Шаг 2: Ожидание контакта -->
+        <div class="card hidden" id="stepWaiting">
+            <h3>⏳ Ожидание контакта</h3>
+            <p>Нажми на кнопку «Отправить контакт» в Telegram, выбери человека и отправь.</p>
+            <div class="loader"></div>
+            <button class="btn btn-secondary" id="cancelBtn">❌ Отменить</button>
         </div>
-        <div class="features">
-            <div class="card">📦 Удалённые</div>
-            <div class="card">✏️ Изменённые</div>
-            <div class="card">👁 View Once</div>
-            <div class="card">📤 Экспорт</div>
+
+        <!-- Шаг 3: Контакт получен, экспорт -->
+        <div class="card hidden" id="stepExport">
+            <h3>📤 Экспорт</h3>
+            <div class="contact-sent" id="contactInfo">✅ Контакт получен</div>
+            <p id="exportStatus">Ищем чат и создаём экспорт...</p>
+            <div class="loader" id="exportLoader"></div>
+            <button class="btn" id="exportBtn">📤 Начать экспорт</button>
         </div>
-        <button id="exportBtn">📦 Экспортировать чат</button>
-        <div class="footer">ДААСС • 7 дней бесплатно</div>
+
+        <div class="footer">ДААСС v2.0 • Контакт удаляется после экспорта</div>
     </div>
-    <script src="app.js"></script>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        // Шаги
+        const stepMain = document.getElementById('stepMain');
+        const stepWaiting = document.getElementById('stepWaiting');
+        const stepExport = document.getElementById('stepExport');
+
+        // Кнопки
+        const sendContactBtn = document.getElementById('sendContactBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const exportBtn = document.getElementById('exportBtn');
+
+        // Статусы
+        const contactInfo = document.getElementById('contactInfo');
+        const exportStatus = document.getElementById('exportStatus');
+        const exportLoader = document.getElementById('exportLoader');
+
+        // Отправить контакт через WebApp
+        sendContactBtn.addEventListener('click', () => {
+            tg.sendData(JSON.stringify({ action: 'request_contact' }));
+            stepMain.classList.add('hidden');
+            stepWaiting.classList.remove('hidden');
+        });
+
+        // Отмена
+        cancelBtn.addEventListener('click', () => {
+            stepWaiting.classList.add('hidden');
+            stepMain.classList.remove('hidden');
+        });
+
+        // Экспорт
+        exportBtn.addEventListener('click', () => {
+            exportStatus.textContent = '⏳ Экспортируем чат...';
+            exportLoader.style.display = 'block';
+            tg.sendData(JSON.stringify({ action: 'export_chat' }));
+        });
+
+        // Слушаем сообщения от бота через WebApp
+        tg.onEvent('mainButtonClicked', (data) => {
+            // Обработка данных
+        });
+
+        // Обработка входящих данных от бота
+        window.addEventListener('message', (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.type === 'contact_received') {
+                    stepWaiting.classList.add('hidden');
+                    stepExport.classList.remove('hidden');
+                    contactInfo.textContent = `✅ Контакт: ${data.name}`;
+                    exportStatus.textContent = 'Готов к экспорту. Нажми кнопку ниже.';
+                }
+                if (data.type === 'export_done') {
+                    exportStatus.textContent = `✅ Экспорт завершён! Файл отправлен.`;
+                    exportLoader.style.display = 'none';
+                    setTimeout(() => tg.close(), 2000);
+                }
+                if (data.type === 'export_error') {
+                    exportStatus.textContent = `❌ Ошибка: ${data.message}`;
+                    exportLoader.style.display = 'none';
+                }
+            } catch (e) {
+                // ignore
+            }
+        });
+
+        // Если бот присылает контакт через WebApp
+        tg.onEvent('contact', (contact) => {
+            tg.sendData(JSON.stringify({
+                action: 'contact_sent',
+                contact: {
+                    user_id: contact.user_id,
+                    first_name: contact.first_name,
+                    last_name: contact.last_name,
+                    phone_number: contact.phone_number
+                }
+            }));
+        });
+    </script>
 </body>
 </html>
