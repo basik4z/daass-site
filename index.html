@@ -1,299 +1,231 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ДААСС</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            background: #0a0a0f;
-            color: #fff;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .container {
-            max-width: 420px;
-            width: 100%;
-        }
-        .logo {
-            font-size: 36px;
-            font-weight: 800;
-            text-align: center;
-            background: linear-gradient(135deg, #6ee7ff, #a855f7);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 24px;
-        }
-        .card {
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 0.5px solid rgba(255, 255, 255, 0.06);
-        }
-        .card h3 {
-            font-size: 16px;
-            margin-bottom: 12px;
-            color: #6ee7ff;
-        }
-        .card p {
-            font-size: 14px;
-            color: #8e9aaf;
-            margin-bottom: 12px;
-        }
-        .btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #6ee7ff, #a855f7);
-            border: none;
-            border-radius: 40px;
-            color: #fff;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            margin-top: 10px;
-        }
-        .btn:active {
-            transform: scale(0.97);
-        }
-        .btn-success {
-            background: linear-gradient(135deg, #34d399, #10b981);
-        }
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        .hidden {
-            display: none;
-        }
-        .footer {
-            text-align: center;
-            font-size: 11px;
-            color: #3a4050;
-            margin-top: 20px;
-        }
-        .timer {
-            font-size: 42px;
-            font-weight: 700;
-            text-align: center;
-            padding: 16px 0;
-            color: #6ee7ff;
-            font-family: 'Courier New', monospace;
-        }
-        .timer-warning {
-            color: #fbbf24;
-        }
-        .timer-danger {
-            color: #f87171;
-            animation: pulse 0.5s infinite alternate;
-        }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            100% { opacity: 0.4; }
-        }
-        .status-text {
-            text-align: center;
-            font-size: 16px;
-            color: #8e9aaf;
-        }
-        .warning-box {
-            background: rgba(251, 191, 36, 0.08);
-            border-left: 3px solid #fbbf24;
-            padding: 12px 16px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            font-size: 13px;
-            color: #fbbf24;
-        }
-        .contact-sent {
-            background: rgba(52, 211, 153, 0.08);
-            border-left: 3px solid #34d399;
-            padding: 12px 16px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            font-size: 13px;
-            color: #34d399;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RBX Store — демо пополнения</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+  body {
+    background: radial-gradient(circle at top, #1e2a44, #0b0f1a 70%);
+    color: #e8eefc;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .demo-banner {
+    background: #ffb703;
+    color: #1a1a1a;
+    text-align: center;
+    padding: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: .5px;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 6vw;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .logo { font-size: 24px; font-weight: 800; color: #fff; }
+  .logo span { color: #00b06f; }
+  .balance {
+    background: rgba(0,176,111,.15);
+    border: 1px solid #00b06f;
+    color: #4dffb0;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  main { flex: 1; padding: 40px 6vw 80px; max-width: 1100px; margin: 0 auto; width: 100%; }
+  h1 { font-size: clamp(26px, 4vw, 40px); margin-bottom: 10px; }
+  .subtitle { color: #93a1bd; margin-bottom: 36px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    background: linear-gradient(160deg, #1b2440, #141b30);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 16px;
+    padding: 24px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: .25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:hover { transform: translateY(-4px); border-color: #00b06f; box-shadow: 0 12px 30px rgba(0,176,111,.18); }
+  .card.selected { border-color: #00b06f; background: linear-gradient(160deg, #173a2c, #12261f); }
+  .card .icon { font-size: 34px; margin-bottom: 10px; }
+  .card .amount { font-size: 26px; font-weight: 800; color: #fff; }
+  .card .amount small { font-size: 15px; color: #9fb0cc; font-weight: 500; }
+  .card .price {
+    margin-top: 14px;
+    display: inline-block;
+    background: #00b06f;
+    color: #04240f;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 14px;
+  }
+  .tag {
+    position: absolute; top: 10px; right: -32px;
+    background: #ffb703; color: #1a1a1a;
+    font-size: 11px; font-weight: 800;
+    padding: 4px 40px; transform: rotate(35deg);
+  }
+  .checkout {
+    margin-top: 34px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 16px;
+    padding: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .summary { color: #93a1bd; font-size: 15px; }
+  .summary b { color: #fff; font-size: 18px; }
+  button.pay {
+    background: linear-gradient(135deg, #00d180, #00a065);
+    border: none;
+    color: #04240f;
+    font-weight: 800;
+    font-size: 16px;
+    padding: 14px 32px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: .2s;
+  }
+  button.pay:hover { filter: brightness(1.1); transform: scale(1.02); }
+  button.pay:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+  .method { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .method label {
+    display: flex; align-items: center; gap: 8px;
+    border: 1px solid rgba(255,255,255,.12);
+    padding: 10px 16px; border-radius: 10px; cursor: pointer;
+    font-size: 14px; color: #c3cee3;
+  }
+  .method input { accent-color: #00b06f; }
+  .method label:has(input:checked) { border-color: #00b06f; background: rgba(0,176,111,.1); color: #fff; }
+  .nick-input {
+    width: 100%; margin-bottom: 24px;
+    background: #0f1626;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: #fff; font-size: 15px;
+  }
+  .nick-input:focus { outline: none; border-color: #00b06f; }
+  footer { text-align: center; padding: 24px; color: #56637a; font-size: 13px; }
+  .toast {
+    position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
+    background: #00b06f; color: #04240f; font-weight: 700;
+    padding: 14px 26px; border-radius: 12px;
+    transition: .4s; z-index: 50; font-size: 15px;
+  }
+  .toast.show { bottom: 30px; }
+</style>
 </head>
 <body>
-    <div class="container">
 
-        <div class="logo">ДААСС</div>
+<div class="demo-banner">⚠ ДЕМО-РЕЖИМ: это макет интерфейса. Реальные платежи и Robux не проводятся.</div>
 
-        <!-- Шаг 1: Главная -->
-        <div class="card" id="stepMain">
-            <h3>📦 Экспорт чата</h3>
-            <p>Отправь контакт человека, с которым хочешь экспортировать переписку.</p>
-            <div class="warning-box">
-                ⚠️ Контакт будет удалён после экспорта
-            </div>
-            <button class="btn btn-success" id="sendContactBtn">📇 Отправить контакт</button>
-        </div>
+<header>
+  <div class="logo">RBX<span>Store</span></div>
+  <div class="balance">Баланс: 0 R$</div>
+</header>
 
-        <!-- Шаг 2: Ожидание контакта с таймером -->
-        <div class="card hidden" id="stepWaiting">
-            <h3>⏳ Ожидание контакта</h3>
-            <div class="status-text" id="waitingText">Жду контакт...</div>
-            <div class="timer" id="timerDisplay">5:00</div>
-            <p style="text-align: center; color: #6a6f7a; font-size: 13px;">Осталось времени</p>
-            <button class="btn btn-secondary" id="cancelBtn">❌ Отменить</button>
-        </div>
+<main>
+  <h1>Пополнить Robux</h1>
+  <p class="subtitle">Выберите пакет, укажите ник и способ оплаты.</p>
 
-        <!-- Шаг 3: Время вышло -->
-        <div class="card hidden" id="stepTimeout">
-            <h3>⏰ Время вышло</h3>
-            <p style="text-align: center; color: #f87171;">Вы не отправили контакт вовремя.</p>
-            <button class="btn" id="retryBtn">🔄 Попробовать снова</button>
-        </div>
+  <input class="nick-input" id="nick" type="text" placeholder="Ваш никнейм в Roblox (например, Builderman)" maxlength="20">
 
-        <!-- Шаг 4: Контакт получен -->
-        <div class="card hidden" id="stepExport">
-            <h3>📤 Экспорт</h3>
-            <div class="contact-sent" id="contactInfo">✅ Контакт получен</div>
-            <p id="exportStatus">Готов к экспорту. Нажми кнопку ниже.</p>
-            <button class="btn" id="exportBtn">📤 Начать экспорт</button>
-        </div>
+  <div class="grid" id="grid"></div>
 
-        <div class="footer">ДААСС v2.0 • Контакт удаляется после экспорта</div>
+  <div class="checkout">
+    <div class="summary" id="summary">Ничего не выбрано</div>
+    <button class="pay" id="payBtn" disabled>Оплатить</button>
+  </div>
+
+  <div style="margin-top:28px">
+    <div class="method">
+      <label><input type="radio" name="pay" value="Карта" checked> 💳 Банковская карта</label>
+      <label><input type="radio" name="pay" value="СБП"> 📱 СБП</label>
+      <label><input type="radio" name="pay" value="Крипта"> ₿ Криптовалюта</label>
     </div>
+  </div>
+</main>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
+<footer>Демо-версия. Не связано с Roblox Corporation. Все данные вымышлены.</footer>
 
-        const stepMain = document.getElementById('stepMain');
-        const stepWaiting = document.getElementById('stepWaiting');
-        const stepTimeout = document.getElementById('stepTimeout');
-        const stepExport = document.getElementById('stepExport');
-        const timerDisplay = document.getElementById('timerDisplay');
-        const waitingText = document.getElementById('waitingText');
+<div class="toast" id="toast"></div>
 
-        const sendContactBtn = document.getElementById('sendContactBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const retryBtn = document.getElementById('retryBtn');
-        const exportBtn = document.getElementById('exportBtn');
-        const contactInfo = document.getElementById('contactInfo');
-        const exportStatus = document.getElementById('exportStatus');
+<script>
+  const packs = [
+    { robux: 400,   price: 349,  tag: '' },
+    { robux: 800,   price: 649,  tag: 'ХИТ' },
+    { robux: 1700,  price: 1290, tag: '' },
+    { robux: 4500,  price: 3190, tag: 'ВЫГОДНО' },
+    { robux: 10000, price: 6690, tag: '' },
+    { robux: 22500, price: 13990, tag: 'MAX' },
+  ];
 
-        let timerInterval = null;
-        let timeLeft = 300;
-        let isWaiting = false;
+  let selected = null;
+  const grid = document.getElementById('grid');
+  const summary = document.getElementById('summary');
+  const payBtn = document.getElementById('payBtn');
 
-        function updateTimer() {
-            const mins = Math.floor(timeLeft / 60);
-            const secs = timeLeft % 60;
-            timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  packs.forEach((p, i) => {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML = `
+      ${p.tag ? `<div class="tag">${p.tag}</div>` : ''}
+      <div class="icon">💰</div>
+      <div class="amount">${p.robux.toLocaleString('ru-RU')} <small>R$</small></div>
+      <div class="price">${p.price.toLocaleString('ru-RU')} ₽</div>
+    `;
+    el.onclick = () => select(i, el);
+    grid.appendChild(el);
+  });
 
-            if (timeLeft <= 10) {
-                timerDisplay.className = 'timer timer-danger';
-            } else if (timeLeft <= 30) {
-                timerDisplay.className = 'timer timer-warning';
-            } else {
-                timerDisplay.className = 'timer';
-            }
-        }
+  function select(i, el) {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selected = packs[i];
+    summary.innerHTML = `Выбрано: <b>${selected.robux.toLocaleString('ru-RU')} R$</b> за <b>${selected.price.toLocaleString('ru-RU')} ₽</b>`;
+    payBtn.disabled = false;
+  }
 
-        function startTimer() {
-            timeLeft = 300;
-            updateTimer();
-            isWaiting = true;
+  payBtn.onclick = () => {
+    const nick = document.getElementById('nick').value.trim();
+    if (!nick) { showToast('Сначала укажите никнейм!'); return; }
+    const method = document.querySelector('input[name="pay"]:checked').value;
+    payBtn.disabled = true;
+    payBtn.textContent = 'Обработка...';
+    setTimeout(() => {
+      showToast(`Демо: ${selected.robux} R$ для «${nick}» — оплата через ${method} (симуляция)`);
+      payBtn.textContent = 'Оплатить';
+      payBtn.disabled = false;
+    }, 1200);
+  };
 
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimer();
-
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    timerInterval = null;
-                    isWaiting = false;
-                    stepWaiting.classList.add('hidden');
-                    stepTimeout.classList.remove('hidden');
-                }
-            }, 1000);
-        }
-
-        function resetTimer() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-            }
-            isWaiting = false;
-            timeLeft = 300;
-            updateTimer();
-        }
-
-        function requestContact() {
-            resetTimer();
-            stepMain.classList.add('hidden');
-            stepWaiting.classList.remove('hidden');
-            waitingText.textContent = 'Жду контакт...';
-            startTimer();
-            tg.sendData(JSON.stringify({ action: 'request_contact' }));
-        }
-
-        sendContactBtn.addEventListener('click', requestContact);
-
-        cancelBtn.addEventListener('click', () => {
-            resetTimer();
-            stepWaiting.classList.add('hidden');
-            stepMain.classList.remove('hidden');
-        });
-
-        retryBtn.addEventListener('click', () => {
-            stepTimeout.classList.add('hidden');
-            requestContact();
-        });
-
-        tg.onEvent('contact', (contact) => {
-            if (!isWaiting) return;
-            resetTimer();
-            stepWaiting.classList.add('hidden');
-            stepExport.classList.remove('hidden');
-            contactInfo.textContent = `✅ Контакт: ${contact.first_name} ${contact.last_name || ''}`;
-            exportStatus.textContent = 'Готов к экспорту.';
-
-            tg.sendData(JSON.stringify({
-                action: 'contact_sent',
-                contact: {
-                    user_id: contact.user_id,
-                    first_name: contact.first_name,
-                    last_name: contact.last_name,
-                    phone_number: contact.phone_number
-                }
-            }));
-        });
-
-        exportBtn.addEventListener('click', () => {
-            exportStatus.textContent = '⏳ Экспортируем чат...';
-            tg.sendData(JSON.stringify({ action: 'export_chat' }));
-        });
-
-        window.addEventListener('message', (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                if (data.type === 'export_done') {
-                    exportStatus.textContent = '✅ Экспорт завершён!';
-                    setTimeout(() => tg.close(), 2000);
-                }
-                if (data.type === 'export_error') {
-                    exportStatus.textContent = `❌ Ошибка: ${data.message}`;
-                }
-            } catch (e) {}
-        });
-    </script>
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+  }
+</script>
 </body>
 </html>
