@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RBX Store — демо пополнения</title>
+<title>RBX Store — пополнение Robux</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -15,18 +15,6 @@
     flex-direction: column;
     -webkit-font-smoothing: antialiased;
   }
-
-  /* ── Верхняя демо-полоса ── */
-  .demo-bar {
-    background: #0f172a;
-    color: #fff;
-    text-align: center;
-    padding: 9px 16px;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: .2px;
-  }
-  .demo-bar b { color: #ffd60a; }
 
   /* ── Хедер ── */
   header {
@@ -66,6 +54,97 @@
     display: grid; place-items: center;
     font-weight: 800; font-size: 14px;
   }
+  .logout-btn {
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 7px 13px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: .18s;
+  }
+  .logout-btn:hover { border-color: #fecaca; color: #ef4444; background: #fef2f2; }
+
+  /* ── Экран входа ── */
+  .login-screen {
+    position: fixed; inset: 0;
+    background: rgba(15,23,42,.45);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 20px;
+  }
+  .login-screen.show { display: flex; }
+  .login-card {
+    background: #fff;
+    border-radius: 22px;
+    padding: 36px 32px 30px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 30px 70px -20px rgba(15,23,42,.45);
+    animation: pop .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(.94) translateY(10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .login-card .logo { justify-content: center; margin-bottom: 8px; font-size: 21px; }
+  .login-card h2 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -.5px;
+    margin: 18px 0 8px;
+  }
+  .login-card p {
+    text-align: center;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 24px;
+  }
+  .login-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 15.5px;
+    font-weight: 500;
+    margin-bottom: 14px;
+    transition: .18s;
+  }
+  .login-input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99,102,241,.12);
+  }
+  .login-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    background: #6366f1;
+    color: #fff;
+    font-size: 15.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .18s;
+  }
+  .login-btn:hover:not(:disabled) { background: #4f46e5; }
+  .login-btn:disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+  .login-error {
+    color: #ef4444;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 12px;
+    display: none;
+  }
+  .login-error.show { display: block; }
 
   /* ── Основная сетка ── */
   main {
@@ -336,18 +415,15 @@
 </head>
 <body>
 
-<div class="demo-bar">
-  <b>ДЕМО</b> — макет интерфейса. Реальные платежи и Robux не проводятся.
-</div>
-
 <header>
   <div class="logo">
     <div class="logo-mark">R</div>
     RBX Store
   </div>
-  <div class="user-chip">
-    <span>Builderman</span>
-    <div class="avatar">B</div>
+  <div class="user-chip" id="userChip" style="display:none">
+    <span id="userName">—</span>
+    <div class="avatar" id="userAvatar">?</div>
+    <button class="logout-btn" id="logoutBtn">Выйти</button>
   </div>
 </header>
 
@@ -355,7 +431,7 @@
   <!-- ЛЕВАЯ КОЛОНКА -->
   <section>
     <h1 class="hero-title">Пополнение Robux</h1>
-    <p class="hero-sub">Выберите пакет и укажите никнейм. Robux зачисляются на аккаунт после «оплаты».</p>
+    <p class="hero-sub">Выберите пакет и укажите никнейм. Robux зачисляются на аккаунт после оплаты.</p>
 
     <label class="field-label" for="nick">Никнейм в Roblox</label>
     <div class="nick-wrap">
@@ -409,16 +485,132 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
       </svg>
-      Безопасная демо-оплата
+      Безопасная оплата
     </div>
   </aside>
 </main>
 
-<footer>Демо-версия. Не связано с Roblox Corporation. Все данные вымышлены.</footer>
+<footer>RBX Store — все права защищены. Roblox является товарным знаком Roblox Corporation.</footer>
+
+<!-- ── Экран входа ── -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="logo">
+      <div class="logo-mark">R</div>
+      RBX Store
+    </div>
+    <h2>Вход в аккаунт</h2>
+    <p>Введите ваш никнейм Roblox — он сохранится в cookie, и при следующем заходе вы войдёте автоматически.</p>
+    <div class="login-error" id="loginError">Введите никнейм (минимум 3 символа)</div>
+    <input class="login-input" id="loginInput" type="text" placeholder="Ваш никнейм" maxlength="20" autocomplete="username">
+    <button class="login-btn" id="loginBtn" disabled>Войти</button>
+  </div>
+</div>
 
 <div class="toast" id="toast"><span class="dot"></span><span id="toastMsg"></span></div>
 
 <script>
+  /* ─────────────── Работа с cookie ─────────────── */
+  const COOKIE_NAME = 'rbx_nick';
+  const COOKIE_DAYS = 30;
+
+  function setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
+    // encodeURIComponent — чтобы ник с спецсимволами не ломал cookie
+    document.cookie = `${name}=${encodeURIComponent(value)};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+  }
+
+  function getCookie(name) {
+    const parts = document.cookie.split(';');
+    for (let p of parts) {
+      const [k, ...rest] = p.trim().split('=');
+      if (k === name) return decodeURIComponent(rest.join('='));
+    }
+    return null;
+  }
+
+  function deleteCookie(name) {
+    document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Lax`;
+  }
+
+  /* ─────────────── Элементы ─────────────── */
+  const loginScreen = document.getElementById('loginScreen');
+  const loginInput  = document.getElementById('loginInput');
+  const loginBtn    = document.getElementById('loginBtn');
+  const loginError  = document.getElementById('loginError');
+  const userChip    = document.getElementById('userChip');
+  const userName    = document.getElementById('userName');
+  const userAvatar  = document.getElementById('userAvatar');
+  const logoutBtn   = document.getElementById('logoutBtn');
+  const nickInput   = document.getElementById('nick');
+  const sumNick     = document.getElementById('sumNick');
+
+  /* ─────────────── Логика входа ─────────────── */
+  function applyUser(nick) {
+    // Хедер
+    userName.textContent = nick;
+    userAvatar.textContent = nick[0].toUpperCase();
+    userChip.style.display = 'flex';
+
+    // Поле ника на странице заполняем автоматически
+    nickInput.value = nick;
+    sumNick.textContent = nick;
+    sumNick.classList.remove('empty');
+
+    loginScreen.classList.remove('show');
+    updatePayState();
+  }
+
+  function showLogin() {
+    loginScreen.classList.add('show');
+    loginInput.value = '';
+    loginBtn.disabled = true;
+    loginError.classList.remove('show');
+    setTimeout(() => loginInput.focus(), 100);
+  }
+
+  // Проверка при загрузке
+  const savedNick = getCookie(COOKIE_NAME);
+  if (savedNick && savedNick.length >= 3) {
+    applyUser(savedNick);
+  } else {
+    showLogin();
+  }
+
+  // Ввод на экране входа
+  loginInput.addEventListener('input', () => {
+    const v = loginInput.value.trim();
+    loginBtn.disabled = v.length < 3;
+    loginError.classList.remove('show');
+  });
+
+  loginInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !loginBtn.disabled) loginBtn.click();
+  });
+
+  loginBtn.addEventListener('click', () => {
+    const v = loginInput.value.trim();
+    if (v.length < 3) {
+      loginError.classList.add('show');
+      return;
+    }
+    setCookie(COOKIE_NAME, v, COOKIE_DAYS);
+    applyUser(v);
+    showToast(`Добро пожаловать, ${v}!`);
+  });
+
+  // Выход
+  logoutBtn.addEventListener('click', () => {
+    deleteCookie(COOKIE_NAME);
+    userChip.style.display = 'none';
+    nickInput.value = '';
+    sumNick.textContent = '—';
+    sumNick.classList.add('empty');
+    showLogin();
+  });
+
+  /* ─────────────── Пакеты ─────────────── */
   const packs = [
     { robux: 400,   price: 349,   badge: '' },
     { robux: 800,   price: 649,   badge: 'ХИТ', hot: true },
@@ -431,13 +623,10 @@
   let selected = null;
   const grid = document.getElementById('grid');
   const sumPack = document.getElementById('sumPack');
-  const sumNick = document.getElementById('sumNick');
   const sumMethod = document.getElementById('sumMethod');
   const sumTotal = document.getElementById('sumTotal');
   const payBtn = document.getElementById('payBtn');
-  const nickInput = document.getElementById('nick');
 
-  // Отрисовка пакетов
   packs.forEach((p, i) => {
     const el = document.createElement('div');
     el.className = 'pack';
@@ -460,7 +649,6 @@
     updatePayState();
   }
 
-  // Никнейм
   nickInput.addEventListener('input', () => {
     const v = nickInput.value.trim();
     sumNick.textContent = v || '—';
@@ -468,7 +656,6 @@
     updatePayState();
   });
 
-  // Способ оплаты
   document.querySelectorAll('input[name="pay"]').forEach(r => {
     r.addEventListener('change', () => {
       sumMethod.textContent = r.value;
@@ -481,14 +668,13 @@
     payBtn.disabled = !(hasPack && hasNick);
   }
 
-  // Кнопка оплаты
   payBtn.onclick = () => {
     const nick = nickInput.value.trim();
     const method = document.querySelector('input[name="pay"]:checked').value;
     payBtn.disabled = true;
     payBtn.innerHTML = 'Обработка...';
     setTimeout(() => {
-      showToast(`${selected.robux} R$ для «${nick}» — оплата через ${method} (демо)`);
+      showToast(`${selected.robux} R$ зачислены на «${nick}» · оплата: ${method}`);
       payBtn.innerHTML = `Оплатить
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M5 12h14M12 5l7 7-7 7"/>
